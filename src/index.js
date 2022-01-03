@@ -8,6 +8,33 @@ const port = process.env.PORT || 3000
 
 app.use(express.json())
 
+// get all users documents
+app.get('/users', (req, res) => {
+
+    User.find({}).then((users) => {
+        res.send(users)
+    }).catch((e) => {
+        res.status(500).send()
+    })
+})
+
+//get single user by id
+app.get('/users/:id', (req, res) => {
+    const _id = req.params.id
+    User.find({
+        _id
+    }).then((user) => {
+        if (!user) {
+            res.status(404)
+        }
+        res.send(user)
+
+    }).catch((e) => {
+        res.status(500).send()
+    })
+})
+
+
 // add a new user (post request)
 app.post('/user', (req, res) => {
     const user = new User(req.body)

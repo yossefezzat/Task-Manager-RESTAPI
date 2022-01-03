@@ -45,6 +45,30 @@ app.post('/user', (req, res) => {
     })
 })
 
+// get all tasks
+app.get('/tasks', (req, res) => {
+    Task.find({}).then((tasks) => {
+        res.send(tasks)
+    }).catch((e) => {
+        res.status(500).send(e)
+    })
+})
+
+// get a single task 
+app.get('/tasks/:id', (req, res) => {
+    const _id = req.params.id
+    Task.find({
+        _id
+    }).then((task) => {
+        if (!task) {
+            res.status(404).send()
+        }
+        res.send(task)
+    }).catch((e) => {
+        res.status(500).send(e)
+    })
+})
+
 
 // add a new task (post request)
 app.post('/task', (req, res) => {
@@ -53,6 +77,12 @@ app.post('/task', (req, res) => {
         res.status(201).send(task)
     }).catch((e) => {
         res.status(400).send(e)
+    })
+})
+
+app.get('/*', (req, res) => {
+    res.status(404).send({
+        error: 'page not found'
     })
 })
 

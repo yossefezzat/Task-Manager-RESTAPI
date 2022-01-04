@@ -19,8 +19,8 @@ app.get('/users', async (req, res) => {
 
 //get single user by id
 app.get('/users/:id', async (req, res) => {
+    const _id = req.params.id
     try {
-        _id = req.params.id
         const user = await User.findById(_id)
         if (!user)
             res.status(404).send()
@@ -41,6 +41,43 @@ app.post('/user', async (req, res) => {
     }
 })
 
+// update a task
+app.patch('/user/:id', async (req, res) => {
+    const _id = req.params.id
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['name', 'age', 'password', 'email']
+    const isvalidUpdates = updates.every((update) => allowedUpdates.includes(update))
+    if (!isvalidUpdates) {
+        return res.status(400).send({
+            error: 'invalid updates'
+        })
+    }
+    try {
+        const user = await User.findByIdAndUpdate(_id, req.body, {
+            new: true,
+            runValidators: true
+        })
+        if (!user)
+            return res.status(404).send()
+        res.send(user)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+})
+
+// delete user by id 
+app.delete('/user/:id', async (req, res) => {
+    const _id = req.params.id
+    try {
+        const user = await User.findByIdAndDelete(_id)
+        if (!user)
+            return res.status(404).send() //not found 404
+        res.send(user)
+    } catch (e) {
+        res.status(500).send(e) //server error 500
+    }
+})
+
 // get all tasks
 app.get('/tasks', async (req, res) => {
     try {
@@ -53,8 +90,8 @@ app.get('/tasks', async (req, res) => {
 
 // get a single task 
 app.get('/tasks/:id', async (req, res) => {
+    const _id = req.params.id
     try {
-        const _id = req.params.id
         const task = await Task.findById(_id)
         if (!task)
             res.status(404).send()
@@ -72,6 +109,43 @@ app.post('/task', async (req, res) => {
         res.status(201).send(task) // Created status 201
     } catch (e) {
         res.status(400).send(e) // bad request 400
+    }
+})
+
+// update a task
+app.patch('/task/:id', async (req, res) => {
+    const _id = req.params.id
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['description', 'completed']
+    const isvalidUpdates = updates.every((update) => allowedUpdates.includes(update))
+    if (!isvalidUpdates) {
+        return res.status(400).send({
+            error: 'invalid updates'
+        })
+    }
+    try {
+        const task = await Task.findByIdAndUpdate(_id, req.body, {
+            new: true,
+            runValidators: true
+        })
+        if (!task)
+            return res.status(404).send()
+        res.send(task)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+})
+
+// delete user by id 
+app.delete('/task/:id', async (req, res) => {
+    const _id = req.params.id
+    try {
+        const task = await Task.findByIdAndDelete(_id)
+        if (!task)
+            return res.status(404).send() //not found 404
+        res.send(task)
+    } catch (e) {
+        res.status(500).send(e) //server error 500
     }
 })
 

@@ -2,8 +2,6 @@ const express = require('express')
 const User = require('../models/user')
 const userRouter = new express.Router()
 
-
-//adding a new comment
 // get all users documents
 userRouter.get('/users', async (req, res) => {
     try {

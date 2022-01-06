@@ -21,7 +21,7 @@ userRouter.get('/users/:id', async (req, res) => {
             res.status(404).send()
         res.send(user)
     } catch (e) {
-        res.send(500).send()
+        res.status(500).send()
     }
 })
 
@@ -34,6 +34,19 @@ userRouter.post('/user', async (req, res) => {
     } catch (e) {
         res.status(400).send(e) // bad request 400
     }
+})
+
+// login user
+userRouter.post('/user/login', (req, res) => {
+    User.findByCredentials(req.body.email, req.body.password)
+        .then((user) => res.send(user))
+        .catch((err) => {
+            console.log(err)
+            res.status(400).json({
+                msg: 'Credentials are not valid',
+                errors: err.errors,
+            });
+        });
 })
 
 // update a task

@@ -37,16 +37,14 @@ userRouter.post('/user', async (req, res) => {
 })
 
 // login user
-userRouter.post('/user/login', (req, res) => {
-    User.findByCredentials(req.body.email, req.body.password)
-        .then((user) => res.send(user))
-        .catch((err) => {
-            console.log(err)
-            res.status(400).json({
-                msg: 'Credentials are not valid',
-                errors: err.errors,
-            });
-        });
+userRouter.post('/user/login', async (req, res) => {
+    try {
+        const user = await User.findByCredentials(req.body.email, req.body.password)
+        res.send(user)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+
 })
 
 // update a task

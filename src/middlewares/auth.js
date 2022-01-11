@@ -10,14 +10,15 @@ const auth = async (req, res, next) => {
             'tokens.token': token
         })
         if (!user) {
-            throw new Error('please authenticate')
+            throw Error('please authenticate')
         }
+        req.token = token
         req.user = user
         next()
 
     } catch (e) {
         res.status(401).send({
-            'error': 'unable to login '
+            'error': 'unauthorized login'
         })
     }
 }

@@ -1,15 +1,12 @@
 const express = require('express')
 const User = require('../models/user')
 const userRouter = new express.Router()
-
+const auth = require('../middlewares/auth')
 // get all users documents
-userRouter.get('/users', async (req, res) => {
-    try {
-        const users = await User.find({})
-        res.send(users)
-    } catch (e) {
-        res.status(500).send()
-    }
+
+
+userRouter.get('/users/me', auth, async (req, res) => {
+    res.send(req.user)
 })
 
 //get single user by id
@@ -30,7 +27,11 @@ userRouter.post('/user', async (req, res) => {
     try {
         const user = new User(req.body)
         await user.save()
-        res.status(201).send(user) // created 201
+        const token = await user.generateAuthToken()
+        res.status(201).send({
+            user,
+            token
+        }) // created 201
     } catch (e) {
         res.status(400).send(e) // bad request 400
     }
@@ -40,6 +41,11 @@ userRouter.post('/user', async (req, res) => {
 userRouter.post('/user/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
+        const token = await user.generateAuthToken()
+        res.send({
+            user,
+            token
+        })
         res.send(user)
     } catch (e) {
         res.status(400).send(e)

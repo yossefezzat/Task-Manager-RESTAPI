@@ -40,7 +40,13 @@ const userSchema = new mongoose.Schema({
                 throw new Error('age is invalid number')
             }
         }
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 })
 
 userSchema.methods.generateAuthToken = async function () {
@@ -48,6 +54,10 @@ userSchema.methods.generateAuthToken = async function () {
     const token = jwt.sign({
         _id: user._id.toString()
     }, 'thisismycourse')
+    user.tokens = user.tokens.concat({
+        token
+    })
+    await user.save()
     return token
 }
 

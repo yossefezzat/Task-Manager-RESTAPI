@@ -65,9 +65,13 @@ userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({
         email
     })
-    if (!user) throw new Error('Unable to login')
+    if (!user) throw new Error({
+        error: 'Unable to login'
+    })
     const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) throw new Error('Unable to login')
+    if (!isMatch) throw new Error({
+        error: 'Unable to login'
+    })
     return user
 };
 
@@ -79,6 +83,14 @@ userSchema.pre('save', async function (next) {
     }
     next()
 })
+
+userSchema.methods.toJSON = function () {
+    const user = this
+    const userObject = user.toObject()
+    delete userObject.password
+    delete userObject.tokens
+    return userObject
+}
 
 const User = mongoose.model('User', userSchema)
 

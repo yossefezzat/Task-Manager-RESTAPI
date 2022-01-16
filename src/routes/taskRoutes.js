@@ -22,13 +22,30 @@ taskRouter.get('/tasks/:id', auth, async (req, res) => {
 })
 
 // get all user tasks
+// GET /tasks?completed=true            // filters
+// GET /tasks?limit=3&skip=0           //  pagination
+// GET /tasks?sortBy=createdAt:desc   //   sorting
 taskRouter.get('/tasks', auth, async (req, res) => {
     const user = req.user
+    match = {}
+    sort = {}
+    if (req.query.completed) {
+        match.completed = req.query.completed === 'true'
+    }
+    if (req.query.sortBy) {
+        const parts = req.query.sortBy.split(':')
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+    }
     try {
-        // const tasks = await Task.find({
-        //     owner: user._id
-        // })
-        await user.populate('tasks')
+        await user.populate({
+            path: 'tasks',
+            match,
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip),
+                sort
+            }
+        })
         res.send(user.tasks)
     } catch (e) {
         res.send(500).send() // internal server error
@@ -43,7 +60,7 @@ taskRouter.post('/task', auth, async (req, res) => {
             owner: req.user._id
         })
         await task.save()
-        res.status(201).send(task) // Created status 201
+        res.stsatus(201).send(task) // Created status 201
     } catch (e) {
         res.status(400).send(e) // bad request 400
     }

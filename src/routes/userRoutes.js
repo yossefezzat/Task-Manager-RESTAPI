@@ -1,7 +1,10 @@
 const express = require('express')
+const multer = require('multer')
 const User = require('../models/user')
 const userRouter = new express.Router()
 const auth = require('../middlewares/auth')
+const path = require('path')
+const fs = require('fs')
 
 // add a new user (post request)
 userRouter.post('/user', async (req, res) => {
@@ -96,6 +99,69 @@ userRouter.delete('/user/me', auth, async (req, res) => {
         res.send(req.user)
     } catch (e) {
         res.status(500).send(e) //server error 500
+    }
+})
+/*
+const upload = multer({
+    dest: 'avatars/',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, callback) {
+        if (!file.originalname.match(/\.(png|jpeg|jpg)$/)) {
+            callback(new Error('please upload an image'))
+        }
+        callback(undefined, true)
+    }
+})
+*/
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './uploads')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+})
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 1000000 // 1Mb file size
+    },
+    fileFilter(req, file, callback) {
+        if (!file.originalname.match(/\.(png|jpeg|jpg)$/)) {
+            callback(new Error('please upload an image'), false)
+        } else {
+            callback(undefined, true)
+        }
+
+    }
+})
+
+userRouter.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+    const user = req.user
+    user.avatar = req.file.path
+    try {
+        await user.save()
+        res.send(req.file)
+    } catch (e) {
+        res.status(500).send()
+    }
+}, (error, req, res, next) => {
+    res.status(400).send({
+        error: error.message
+    })
+})
+
+userRouter.delete('/users/me/avatar', auth, async (req, res) => {
+    const user = req.user
+    try {
+        user.avatar = undefined
+        await user.save()
+        res.send(user)
+    } catch (e) {
+        res.status(500).send()
     }
 })
 

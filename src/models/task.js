@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const validator = require('validator')
 require('../db/mongoose.js')
 
 const taskModel = new mongoose.Schema({

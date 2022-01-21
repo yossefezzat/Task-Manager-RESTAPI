@@ -5,12 +5,17 @@ const userRouter = new express.Router()
 const auth = require('../middlewares/auth')
 const path = require('path')
 const fs = require('fs')
+const {
+    sendWelcomeEmail,
+    sendCancelationEmail
+} = require('../emails/account')
 
 // add a new user (post request)
 userRouter.post('/user', async (req, res) => {
     try {
         const user = new User(req.body)
         await user.save()
+        sendWelcomeEmail(user.name, user.email)
         const token = await user.generateAuthToken()
         res.status(201).send({
             user,
@@ -92,29 +97,18 @@ userRouter.patch('/user/me', auth, async (req, res) => {
 })
 
 // delete user by id 
-userRouter.delete('/user/me', auth, async (req, res) => {
+userRouter.delete('/users/me', auth, async (req, res) => {
     try {
+        const user = req.user
         //use remove method from mongoose 
-        await req.user.remove()
+        await user.remove()
+        sendCancelationEmail(user.name, user.email)
         res.send(req.user)
     } catch (e) {
-        res.status(500).send(e) //server error 500
+        res.status(500).send() //server error 500
     }
 })
-/*
-const upload = multer({
-    dest: 'avatars/',
-    limits: {
-        fileSize: 1000000
-    },
-    fileFilter(req, file, callback) {
-        if (!file.originalname.match(/\.(png|jpeg|jpg)$/)) {
-            callback(new Error('please upload an image'))
-        }
-        callback(undefined, true)
-    }
-})
-*/
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, './uploads')
@@ -157,6 +151,12 @@ userRouter.post('/users/me/avatar', auth, upload.single('avatar'), async (req, r
 userRouter.delete('/users/me/avatar', auth, async (req, res) => {
     const user = req.user
     try {
+        if (!user.avatar) res.status(404).send({
+            error: 'Image has been deleted'
+        })
+        await fs.unlink(user.avatar, (err) => {
+            if (err) throw (err)
+        })
         user.avatar = undefined
         await user.save()
         res.send(user)

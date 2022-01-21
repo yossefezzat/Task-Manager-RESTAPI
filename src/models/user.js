@@ -1,8 +1,11 @@
 const mongoose = require('mongoose')
+const config = require('config')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 require('../db/mongoose.js')
+
+const jwtkey = config.get('token.jwtKey')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -64,7 +67,7 @@ userSchema.methods.generateAuthToken = async function () {
     const user = this
     const token = jwt.sign({
         _id: user._id.toString()
-    }, 'thisismycourse')
+    }, jwtkey)
     user.tokens = user.tokens.concat({
         token
     })
@@ -97,9 +100,12 @@ userSchema.pre('save', async function (next) {
 
 userSchema.pre('remove', async function (next) {
     const user = this
-    await task.deleteMany({
-        owner: user._id
-    })
+    if (user.tasks) {
+        await task.deleteMany({
+            owner: user._id
+        })
+    }
+
     next()
 })
 

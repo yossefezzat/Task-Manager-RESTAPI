@@ -5,7 +5,7 @@ module.exports = {
         port: process.env.PORT || 3003,
     },
     database: {
-        url: process.env.MONGODB_URL,
+        url: process.env.MONGODB_URL
     },
     email: {
         username: process.env.EMAIL_USERNAME,

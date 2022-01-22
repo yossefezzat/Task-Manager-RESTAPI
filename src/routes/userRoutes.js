@@ -98,12 +98,13 @@ userRouter.patch('/user/me', auth, async (req, res) => {
 
 // delete user by id 
 userRouter.delete('/users/me', auth, async (req, res) => {
+    const user = req.user
     try {
-        const user = req.user
-        //use remove method from mongoose 
+        console.log(user)
+        // use remove method from mongoose 
         await user.remove()
         sendCancelationEmail(user.name, user.email)
-        res.send(req.user)
+        res.send(user)
     } catch (e) {
         res.status(500).send() //server error 500
     }

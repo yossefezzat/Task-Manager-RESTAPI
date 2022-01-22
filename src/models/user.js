@@ -3,6 +3,8 @@ const config = require('config')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const task = require('./task')
+
 require('../db/mongoose.js')
 
 const jwtkey = config.get('token.jwtKey')
@@ -100,12 +102,9 @@ userSchema.pre('save', async function (next) {
 
 userSchema.pre('remove', async function (next) {
     const user = this
-    if (user.tasks) {
-        await task.deleteMany({
-            owner: user._id
-        })
-    }
-
+    await task.deleteMany({
+        owner: user._id
+    })
     next()
 })
 

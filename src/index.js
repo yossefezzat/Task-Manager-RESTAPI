@@ -7,6 +7,7 @@ const config = require('config')
 const app = express()
 
 const port = config.get('app.port')
+
 app.use(express.json())
 
 // GET avatars from public folder  

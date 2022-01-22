@@ -60,9 +60,9 @@ taskRouter.post('/task', auth, async (req, res) => {
             owner: req.user._id
         })
         await task.save()
-        res.stsatus(201).send(task) // Created status 201
+        res.status(201).send(task) // Created status 201
     } catch (e) {
-        res.status(400).send(e) // bad request 400
+        res.status(400).send() // bad request 400
     }
 })
 

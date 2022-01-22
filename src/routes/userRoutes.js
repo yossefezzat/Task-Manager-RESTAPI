@@ -71,7 +71,7 @@ userRouter.post('/user/logoutAll', auth, async (req, res) => {
         res.status(500).send()
     }
 })
-
+//test endpoint
 userRouter.get('/test', (req, res) => {
     res.send('heloooooooooooo')
 })

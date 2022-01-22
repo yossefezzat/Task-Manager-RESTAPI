@@ -72,6 +72,10 @@ userRouter.post('/user/logoutAll', auth, async (req, res) => {
     }
 })
 
+userRouter.get('/test', (req, res) => {
+    res.send('heloooooooooooo')
+})
+
 // update a user data
 userRouter.patch('/user/me', auth, async (req, res) => {
     //get the user from the req.user passed from auth user 

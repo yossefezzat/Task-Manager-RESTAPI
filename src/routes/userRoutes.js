@@ -100,7 +100,6 @@ userRouter.patch('/user/me', auth, async (req, res) => {
 userRouter.delete('/users/me', auth, async (req, res) => {
     const user = req.user
     try {
-        console.log(user)
         // use remove method from mongoose 
         await user.remove()
         sendCancelationEmail(user.name, user.email)

@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js -e js"
+    "start": "SET NODE_ENV=prod&node src/index.js",
+    "dev": "SET NODE_ENV=dev&nodemon src/index.js"
   },
   "author": "",
   "license": "ISC",

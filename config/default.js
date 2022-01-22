@@ -10,6 +10,6 @@ module.exports = {
         url: 'http://localhost:3000'
     },
     api: {
-        prefix: 'api',
+        prefix: '',
     },
 }
